@@ -1,82 +1,58 @@
-
 function submeter() {
     let nome = document.getElementById("nome").value;
     let cpf = document.getElementById("cpf").value;
     let email = document.getElementById("email").value;
 
-    console.log(nome);
-    console.log(validaCPF(cpf));
-    console.log(email);
+    console.log("Nome:", nome);
+    console.log("CPF Válido:", validaCPF(cpf));
+    console.log("Email:", email);
 }
 
 function validaCPF(cpf) {
+    cpf = cpf.replace(/\D+/g, '');  // Remove qualquer caractere não numérico
 
-    if (cpf == "") {
-        alert("Campo CPF nao pode ser vazio");
+    if (cpf === '') {
+        alert("Campo CPF não pode ser vazio");
         return false;
     }
 
-    cpf = cpf.trim();
-
-    if (/[a-zA-Z]/.test(cpf)) {
-        alert("CPF nao pode ter letras");
+    if (cpf.length !== 11) {
+        alert("O CPF deve ter exatamente 11 dígitos");
         return false;
     }
 
-    if (!/^[\d.-]+$/.test(cpf)) {
-        alert("CPF so pode contem numeros, '.' ou '-' ");
+    if (/(\d)\1{10}/.test(cpf)) {
+        alert("CPF inválido: todos os dígitos são iguais");
         return false;
     }
-
-    if (cpf.length != 11 && cpf.length != 14) {
-        alert("Formato invalido");
-        return false;
-    } 
-    
-    return cpfVerification(cpf);
-}
-
-function cpfVerification(cpf) {
-
-    cpf = cpf.replace(/\D+/g, '');
 
     let soma = 0;
     let resto;
-    let digitoV1;
-    let digitoV2;
 
-    //  primeiro digito verificador
-
+    // Validação do primeiro dígito verificador
     for (let i = 0; i < 9; i++) {
-        soma += parseInt(cpf.substring(i, i + 1)) * (10 - i);
+        soma += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    resto = soma % 11;
+    let digitoV1 = resto < 2 ? 0 : 11 - resto;
+
+    if (parseInt(cpf.charAt(9)) !== digitoV1) {
+        alert("CPF inválido");
+        return false;
     }
 
-    if (soma % 11 < 2) {
-        resto = 0;
-    }
-    else {
-        resto = 11 - (soma % 11);
-    }
-    digitoV1 = resto;
-
-    //  segundo digito verificador
-
+    // Validação do segundo dígito verificador
     soma = 0;
     for (let i = 0; i < 10; i++) {
-        soma += parseInt(cpf.substring(i, i + 1)) * (11 - i);
+        soma += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    resto = soma % 11;
+    let digitoV2 = resto < 2 ? 0 : 11 - resto;
+
+    if (parseInt(cpf.charAt(10)) !== digitoV2) {
+        alert("CPF inválido");
+        return false;
     }
 
-    if (soma % 11 < 2) {
-        resto = 0;
-    }
-    else {
-        resto = 11 - (soma % 11);
-    }
-    digitoV2 = resto;
-
-    if (cpf.substring(9, 10) != digitoV1.toString() || cpf.substring(10, 11) != digitoV2.toString()) {
-        alert("CPF é invalido")
-        return false
-    }
     return true;
 }
